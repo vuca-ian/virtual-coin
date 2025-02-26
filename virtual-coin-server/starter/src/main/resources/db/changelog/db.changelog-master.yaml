@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - include:
+      file: classpath*:db/changelog/db.changelog-dm.yaml
+      context: dm
+  - include:
+      file: classpath*:db/changelog/db.changelog-postgres.yaml
+      context: postgres

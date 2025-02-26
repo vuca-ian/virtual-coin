@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    driver-class-name: dm.jdbc.driver.DmDriver
+    #&compatibleMode=oracle
+    url: jdbc:dm://172.20.51.234:30236/meta_server?useSSL=false&serverTimezone=UTC
+    username: meta_server
+    password: Sailing@123
+    type: com.zaxxer.hikari.HikariDataSource
+    hikari:
+      maximum-pool-size: 256
+      minimum-idle: 12
+      connection-timeout: 60000
+      max-lifetime: 540000
+      idle-timeout: 540000
+      connection-test-query: SELECT 1
+  liquibase:
+    change-log: classpath*:db/changelog/db.changelog-master.yaml
+    enabled: true
+    contexts: dm
+    clear-checksums: true
+    drop-first: off
+#    show-summary-output: all

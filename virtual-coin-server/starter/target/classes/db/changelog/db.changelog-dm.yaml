@@ -1,0 +1,9 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2024042401
+      author: snlsai
+      changes:
+        - sqlFile:
+            splitStatements: true
+            stripComments: true
+            path: classpath:db/dameng/sql.changelog-DDL-v1.0.0-01.sql
