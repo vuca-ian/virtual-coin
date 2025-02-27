@@ -30,7 +30,7 @@ import java.util.Arrays;
 @Slf4j
 @Data
 @RequiredArgsConstructor
-@JobTask(name = "DataFetcher", cron = "0 0/1 * * * ?")
+@JobTask(name = "DataFetcher", cron = "0 0/1 * * * ?", condition = "server.websocket.enabled", havingValue = "true")
 public class DataFetcherJobTask extends QuartzJobBean {
     public static final String WEBSOCKET_CANDLESTICK_TOPIC = "market.$symbol$.kline.$period$";
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH");

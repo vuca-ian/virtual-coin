@@ -9,6 +9,9 @@ import cn.virtual.coin.broker.htx.utils.HttpService;
 import cn.virtual.coin.websocket.WebSocketConnection;
 import cn.virtual.coin.websocket.WebSocketHandler;
 import cn.virtual.coin.websocket.chain.FilterContext;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -28,27 +31,40 @@ public class BrokerAutoConfiguration {
         return new HttpService("https://api.huobi.pro");
     }
 
-    @Bean("ws_v1")
-    public WebSocketConnection webSocketConnection (WebSocketHandler<String> handler,WebSocketAuthenticManage authenticManage) throws Exception {
-        return new WebSocketConnectionFactoryBean((HuobiWebSocketHandler) handler, authenticManage, new HuobiOptions(HOST, PATH), true).getObject();
-    }
-    @Bean
-    public WebSocketAuthenticManage authenticManage(){
-        return new WebSocketAuthenticManage();
+    @Configuration
+    @ConditionalOnProperty(prefix = "server.websocket", name = "enabled", havingValue = "true")
+    static class WebSocketConfiguration{
+        @Bean
+        public WebSocketAuthenticManage authenticManage(){
+            return new WebSocketAuthenticManage();
+        }
+
+        @Bean
+        @ConditionalOnBean(FilterContext.class)
+        public HuobiWebSocketHandler huobiWebSocketHandler(@Autowired(required = false) FilterContext filterContext){
+            return new HuobiWebSocketHandler(filterContext);
+        }
+
+        @Bean("ws_v1")
+        @ConditionalOnBean(WebSocketAuthenticManage.class)
+        public WebSocketConnection webSocketConnection (@Autowired(required = false) WebSocketHandler<String> handler,@Autowired(required = false) WebSocketAuthenticManage authenticManage) throws Exception {
+            return new WebSocketConnectionFactoryBean((HuobiWebSocketHandler) handler, authenticManage, new HuobiOptions(HOST, PATH), true).getObject();
+        }
+
+        @Bean
+        @SuppressWarnings("rawtypes, unchecked")
+        public FilterContext context(CandlestickFilter candlestickFilter){
+            FilterContext context = new FilterContext<>();
+            context.addFilterConfig("ping", new PingPongFilter());
+            context.addFilterConfig("candlestick", candlestickFilter);
+    //        context.addFilterConfig("candlestickHistory", candlestickHistoryFilter());
+            context.addFilterConfig("subbed", new SubbedFilter());
+            context.addFilterConfig("auth", new ActionFilter());
+            context.addFilterConfig("orderSub", new OrderSubFilter());
+    //        context.addFilterConfig("OrderPush", orderPushFilter());
+            context.addFilterConfig("error", new ErrorFilter());
+            return context;
+        }
     }
 
-    @Bean
-    @SuppressWarnings("rawtypes, unchecked")
-    public FilterContext context(CandlestickFilter candlestickFilter){
-        FilterContext context = new FilterContext<>();
-        context.addFilterConfig("ping", new PingPongFilter());
-        context.addFilterConfig("candlestick", candlestickFilter);
-//        context.addFilterConfig("candlestickHistory", candlestickHistoryFilter());
-        context.addFilterConfig("subbed", new SubbedFilter());
-        context.addFilterConfig("auth", new ActionFilter());
-        context.addFilterConfig("orderSub", new OrderSubFilter());
-//        context.addFilterConfig("OrderPush", orderPushFilter());
-        context.addFilterConfig("error", new ErrorFilter());
-        return context;
-    }
 }

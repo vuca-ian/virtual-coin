@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
  * @since 2025/2/26 23:30
  */
 @Slf4j
-@Service
 public class HuobiWebSocketHandler implements WebSocketHandler<String>, Encoder {
     private final FilterContext filterContext;
     private boolean enabledSubscribe;

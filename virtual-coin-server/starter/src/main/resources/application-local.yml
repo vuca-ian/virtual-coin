@@ -12,3 +12,14 @@ spring:
       max-lifetime: 540000
       idle-timeout: 540000
       connection-test-query: SELECT 1
+
+  main:
+    allow-circular-references: true
+server.websocket.enabled: false
+
+sharding.rule:
+  symbols: [ethusdt]
+  tables:
+    - logic-table: t_candlestick
+      actual-columns: [symbol, period]
+      actual-tables: [master.t_candlestick_symbol_1min]

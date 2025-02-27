@@ -68,6 +68,19 @@ public final class ScheduleRegistrar implements ResourceLoaderAware, Environment
     public void startJobInstance(Class<QuartzJobBean> target,Map<String, Object> attributes) throws Exception{
         JobDetail detail = JobBuilder.newJob(target).withIdentity(resolve((String) attributes.get("name"))).storeDurably().build();
         CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule(resolve((String) attributes.get("cron"))).withMisfireHandlingInstructionDoNothing();
+        String condition = attributes.containsKey("condition") ? attributes.get("condition").toString(): null;
+        String havingValue = attributes.containsKey("havingValue") ? attributes.get("havingValue").toString() : null;
+        if(StringUtils.hasText(condition)){
+            String conditionValue = resolve(condition);
+            if (!StringUtils.hasText(conditionValue)){
+                return;
+            }
+            if(StringUtils.hasText(havingValue)){
+                if(!havingValue.equals(conditionValue)){
+                    return;
+                }
+            }
+        }
         JobDataMap jobData = new JobDataMap();
         jobData.put("name", attributes.get("name"));
         CronTrigger trigger = TriggerBuilder.newTrigger().withIdentity(resolve((String) attributes.get("name")), "group").forJob(detail).usingJobData(jobData).withSchedule(scheduleBuilder).build();

@@ -1,7 +1,7 @@
 {
   "properties": [
     {
-      "name": "vuca.trace.enabled",
+      "name": "server.websocket.enabled",
       "type": "java.lang.Boolean",
       "description": "The trace is enabled.",
       "sourceType": "cn.vuca.cloud.trace.property.TraceProperties"

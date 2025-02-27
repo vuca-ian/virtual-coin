@@ -73,3 +73,35 @@ COMMENT ON COLUMN t_job_history.symbol IS '符号';
 COMMENT ON COLUMN t_job_history.period IS '周期';
 COMMENT ON COLUMN t_job_history.last_data_time IS '最后一条数据时间';
 COMMENT ON COLUMN t_job_history.loop_count IS '遍历次数';
+
+
+CREATE TABLE IF NOT EXISTS t_candlestick_ethusdt_1min
+(
+    id VARCHAR(32) NOT NULL,
+    symbol VARCHAR(32) NOT NULL,
+    period VARCHAR(32) NOT NULL,
+    count varchar(20) NOT NULL,
+    amount VARCHAR(32) NOT NULL,
+    open decimal(8,4) NOT NULL,
+    close decimal(8,4) NOT NULL,
+    low decimal(8,4) NOT NULL,
+    high decimal(8,4) NOT NULL,
+    vol VARCHAR(32) NOT NULL,
+    analysis VARCHAR(32) NOT NULL,
+    indicator VARCHAR(32) NOT NULL,
+    primary key (id)
+);
+COMMENT ON TABLE t_candlestick_ethusdt_1min IS 'K线烛台';
+COMMENT ON COLUMN t_candlestick_ethusdt_1min.symbol IS '符号';
+COMMENT ON COLUMN t_candlestick_ethusdt_1min.period IS '周期';
+COMMENT ON COLUMN t_candlestick_ethusdt_1min.count IS '数量';
+COMMENT ON COLUMN t_candlestick_ethusdt_1min.amount IS '总量';
+COMMENT ON COLUMN t_candlestick_ethusdt_1min.open IS '开始';
+COMMENT ON COLUMN t_candlestick_ethusdt_1min.close IS '结束';
+COMMENT ON COLUMN t_candlestick_ethusdt_1min.low IS '低';
+COMMENT ON COLUMN t_candlestick_ethusdt_1min.high IS '高';
+COMMENT ON COLUMN t_candlestick_ethusdt_1min.vol IS '量';
+COMMENT ON COLUMN t_candlestick_ethusdt_1min.analysis IS '分析';
+COMMENT ON COLUMN t_candlestick_ethusdt_1min.indicator IS '指标';
+
+

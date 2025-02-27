@@ -14,4 +14,6 @@ import java.lang.annotation.Target;
 public @interface JobTask {
     String name();
     String cron();
+    String condition() default "";
+    String havingValue() default "";
 }

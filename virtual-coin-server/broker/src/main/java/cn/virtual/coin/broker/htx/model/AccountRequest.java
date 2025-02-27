@@ -1,6 +1,6 @@
 package cn.virtual.coin.broker.htx.model;
 
-import com.vuca.cloud.commons.bean.BeanMapper;
+import cn.vuca.cloud.commons.beans.OrikaBeanMapper;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -30,7 +30,7 @@ public class AccountRequest implements ApiModel<List<AccountRequest>>, Serializa
     }
 
     public AccountModel convertTo(String userId){
-        AccountModel account = BeanMapper.convert(this, AccountModel.class);
+        AccountModel account = OrikaBeanMapper.convert(this, AccountModel.class);
         account.setUserId(userId);
         account.setAccountId(this.id);
         return account;
