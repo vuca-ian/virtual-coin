@@ -8,7 +8,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
 import javax.sql.DataSource;
-import javax.xml.crypto.Data;
 
 /**
  * @author gdyang
@@ -23,10 +22,10 @@ public class DomainAutoConfiguration {
     public ShardingDataSourceRegistrar shardingDataSourceRegistrar() throws Exception {
         return new ShardingDataSourceRegistrar();
     }
-
-    @Bean
-    @Primary
-    public DataSource dataSource(ShardingDataSourceRegistrar registrar) throws Exception {
-        return registrar.getObject();
-    }
+//
+//    @Bean
+//    @Primary
+//    public DataSource dataSource(ShardingDataSourceRegistrar registrar) throws Exception {
+//        return registrar.getObject();
+//    }
 }

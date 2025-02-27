@@ -1,2 +1,0 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-cn.virtual.coin.broker.BrokerAutoConfiguration

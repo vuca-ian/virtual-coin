@@ -13,8 +13,8 @@ spring:
       idle-timeout: 540000
       connection-test-query: SELECT 1
 
-  main:
-    allow-circular-references: true
+#  main:
+#    allow-circular-references: true
 server.websocket.enabled: false
 
 sharding.rule:

@@ -1,9 +1,0 @@
-databaseChangeLog:
-  - changeSet:
-      id: 20250202401
-      author: vuca
-      changes:
-        - sqlFile:
-            splitStatements: true
-            stripComments: true
-            path: classpath:db/postgres/sql-changelog-DDL-v1.0.0.sql

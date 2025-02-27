@@ -12,7 +12,6 @@ spring:
     contexts: postgres
     clear-checksums: true
     drop-first: off
-
 mybatis-plus:
   global-config:
     db-config:

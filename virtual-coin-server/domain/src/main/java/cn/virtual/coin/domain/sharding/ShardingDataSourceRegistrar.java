@@ -1,51 +1,42 @@
 package cn.virtual.coin.domain.sharding;
 
-import cn.vuca.cloud.commons.maps.Maps;
+import com.dangdang.ddframe.rdb.sharding.api.rule.BindingTableRule;
+import com.dangdang.ddframe.rdb.sharding.api.rule.DataSourceRule;
+import com.dangdang.ddframe.rdb.sharding.api.rule.ShardingRule;
+import com.dangdang.ddframe.rdb.sharding.api.rule.TableRule;
+import com.dangdang.ddframe.rdb.sharding.api.strategy.table.TableShardingStrategy;
+import com.dangdang.ddframe.rdb.sharding.config.ShardingPropertiesConstant;
+import com.dangdang.ddframe.rdb.sharding.jdbc.core.datasource.ShardingDataSource;
 import com.zaxxer.hikari.HikariDataSource;
-
-import lombok.Data;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import org.apache.shardingsphere.driver.jdbc.core.datasource.ShardingSphereDataSource;
-import org.apache.shardingsphere.sharding.route.strategy.ShardingStrategy;
-import org.apache.shardingsphere.sharding.route.strategy.type.complex.ComplexShardingStrategy;
-import org.apache.shardingsphere.sharding.rule.ShardingRule;
-import org.apache.shardingsphere.sharding.rule.TableRule;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.Environment;
-import org.springframework.lang.NonNull;
+import org.springframework.stereotype.Service;
 
 import javax.sql.DataSource;
-import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * cn.virtual.coin.domain.sharding
- *
- * @author yang guo dong
- * @since 2025/2/27 11:11
+ * @author gdyang
+ * @since  2021/7/23 10:36 上午
  */
-public class ShardingDataSourceRegistrar implements FactoryBean<ShardingSphereDataSource>, EnvironmentAware {
+public class ShardingDataSourceRegistrar implements FactoryBean<ShardingDataSource>, EnvironmentAware {
     private static final String SYMBOL = "symbol";
-//    private final KeyGenerator keyGenerator = new DefaultKeyGenerator();
-//    private final ShardingStrategy noneShardingStrategy = new NoneShardingStrategy();
-//    private final DataSource dataSource;
-    @Getter
-    @Setter
-    private String[] symbols;
-    @Getter
-    @Setter
-    private List<TableConfig> tables;
+
     private Environment environment;
-    private ShardingSphereDataSource shardingDataSource;
-//    public ShardingDataSourceRegistrar(DataSource dataSource) {
-//        this.dataSource = dataSource;
-//    }
+    private ShardingDataSource shardingDataSource;
+
+
+    private List<TableConfig> tables;
+    private String[] symbols;
+    @Override
+    public ShardingDataSource getObject() throws Exception {
+        return shardingDataSource;
+    }
 
     private DataSource buildDataSource(){
         DataSourceProperties dataSourceProperties = Binder.get(environment).bind("spring.datasource", DataSourceProperties.class).get();
@@ -53,17 +44,36 @@ public class ShardingDataSourceRegistrar implements FactoryBean<ShardingSphereDa
     }
 
     @Override
-    public ShardingSphereDataSource getObject() throws Exception {
-        return shardingDataSource;
+    public Class<?> getObjectType() {
+        return ShardingDataSource.class;
     }
 
-//    private TableRule buildTableRule(TableConfig tableConfig, Map<String, DataSource> dataSourceMap){
-//        List<String> tables = buildTable(tableConfig, this.getSymbols());
-//        ShardingStrategy tableShardingStrategy = new ComplexShardingStrategy(String.join(",", tables), new SymbolPeriodMultiplesTableShardingAlgorithm());
-//        return new TableRule(tableConfig.getLogicTable(), tables, dataSourceMap, noneShardingStrategy ,tableShardingStrategy, "", keyGenerator, "");
-//    }
+    @SneakyThrows
+    @Override
+    public void setEnvironment(Environment environment) {
+        this.environment = environment;
+        DataSource dataSource = buildDataSource();
+        Map<String,DataSource> dsMap = new HashMap<>();
+        dsMap.put("master", dataSource);
+        DataSourceRule dataSourceRule = new DataSourceRule(dsMap, "master");
+        ShardingDataSourceRegistrar rules = Binder.get(environment).bind("sharding.rule", ShardingDataSourceRegistrar.class).get();
 
-    private List<String> buildTable(TableConfig tableConfig, String[] symbols){
+
+        List<TableRule> tableRuleList = rules.getTables().stream().map(config ->
+            TableRule.builder(config.getLogicTable()).actualTables(buildTableRule(config, rules.getSymbols()))
+                        .tableShardingStrategy(new TableShardingStrategy(Arrays.asList(config.getActualColumns()), new SymbolPeriodMultiplesTableShardingAlgorithm(config.getActualColumns())))
+                    .dataSourceRule(dataSourceRule).build()
+        ).collect(Collectors.toList());
+        ShardingRule.ShardingRuleBuilder builder = ShardingRule.builder()
+                .dataSourceRule(dataSourceRule)
+                .tableRules(tableRuleList)
+                .bindingTableRules(Collections.singletonList(new BindingTableRule(tableRuleList)));
+        Properties prop = new Properties();
+        prop.setProperty(ShardingPropertiesConstant.SQL_SHOW.getKey(), "false");
+        shardingDataSource = new ShardingDataSource(builder.build(), prop);
+    }
+
+    private List<String> buildTableRule(TableConfig tableConfig, String[] symbols){
         List<String> actualTables = new ArrayList<>();
         Arrays.stream(tableConfig.getActualTables()).forEach(tab -> {
             Arrays.stream(symbols).forEach(symbol -> {
@@ -73,23 +83,19 @@ public class ShardingDataSourceRegistrar implements FactoryBean<ShardingSphereDa
         return actualTables;
     }
 
-    @Override
-    public Class<?> getObjectType() {
-        return ShardingSphereDataSource.class;
+    public List<TableConfig> getTables() {
+        return tables;
     }
 
-    @Override
-    public void setEnvironment(@NonNull Environment environment) {
-        this.environment = environment;
-        try {
-            ShardingDataSourceRegistrar rules = Binder.get(environment).bind("sharding.rule", ShardingDataSourceRegistrar.class).get();
-            this.symbols = rules.getSymbols();
-            Map<String, DataSource> dataSourceMap = Maps.of("master", buildDataSource()).build();
-//            List<TableRule> tableRules = rules.getTables().stream().map(t -> buildTableRule(t, dataSourceMap)).collect(Collectors.toList());
-//            ShardingRule rule = new ShardingRule(dataSourceMap, "master", tableRules, Collections.singletonList("default"),this.noneShardingStrategy, null, this.keyGenerator);
-//            shardingDataSource = new ShardingSphereDataSource(rule);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    public void setTables(List<TableConfig> tables) {
+        this.tables = tables;
+    }
+
+    public String[] getSymbols() {
+        return symbols;
+    }
+
+    public void setSymbols(String[] symbols) {
+        this.symbols = symbols;
     }
 }
