@@ -12,6 +12,17 @@
         <module name="websocket" />
         <module name="domain" />
       </profile>
+      <profile name="Gradle Imported" enabled="true">
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.16.20/lombok-1.16.20.jar" />
+        </processorPath>
+      </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="scs-web.scs-common" target="1.8" />
+      <module name="scs-web.scs-common.main" target="1.8" />
+      <module name="scs-web.scs-common.test" target="1.8" />
+    </bytecodeTargetLevel>
   </component>
 </project>

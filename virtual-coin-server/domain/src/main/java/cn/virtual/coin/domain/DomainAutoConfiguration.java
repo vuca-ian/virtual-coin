@@ -1,13 +1,17 @@
 package cn.virtual.coin.domain;
 
-import cn.virtual.coin.domain.sharding.ShardingDataSourceRegistrar;
+import cn.virtual.coin.domain.sharding.ComplexShardingTableInterceptor;
+import cn.virtual.coin.domain.sharding.ShardingAlgorithmProperty;
+import com.baomidou.mybatisplus.annotation.DbType;
+import com.baomidou.mybatisplus.autoconfigure.MybatisPlusPropertiesCustomizer;
+import com.baomidou.mybatisplus.core.config.GlobalConfig;
+import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
+import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
-
-import javax.sql.DataSource;
 
 /**
  * @author gdyang
@@ -19,13 +23,27 @@ import javax.sql.DataSource;
 public class DomainAutoConfiguration {
 
     @Bean
-    public ShardingDataSourceRegistrar shardingDataSourceRegistrar() throws Exception {
-        return new ShardingDataSourceRegistrar();
+    @ConfigurationProperties(prefix = "sharding.rule.tables")
+    public ShardingAlgorithmProperty shardingAlgorithmProperty(){
+        return new ShardingAlgorithmProperty();
     }
-//
-//    @Bean
-//    @Primary
-//    public DataSource dataSource(ShardingDataSourceRegistrar registrar) throws Exception {
-//        return registrar.getObject();
-//    }
+
+
+    @Bean
+    public MybatisPlusInterceptor mybatisPlusInterceptor(ComplexShardingTableInterceptor complexShardingTableInterceptor) {
+        MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
+        interceptor.addInnerInterceptor(new PaginationInnerInterceptor(DbType.POSTGRE_SQL));
+        interceptor.addInnerInterceptor(complexShardingTableInterceptor);
+        return interceptor;
+    }
+
+
+    @Bean
+    public MybatisPlusPropertiesCustomizer plusPropertiesCustomizer() {
+        return plusProperties -> {
+            GlobalConfig.DbConfig dbConfig = new GlobalConfig.DbConfig();
+            dbConfig.setColumnFormat("\"%s\""); // 自动添加反引号
+            plusProperties.setGlobalConfig(new GlobalConfig().setDbConfig(dbConfig));
+        };
+    }
 }

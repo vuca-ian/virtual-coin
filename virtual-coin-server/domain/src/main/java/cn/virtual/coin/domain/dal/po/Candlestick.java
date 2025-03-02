@@ -3,6 +3,7 @@ package cn.virtual.coin.domain.dal.po;
 
 import cn.vuca.cloud.api.model.Model;
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -30,16 +31,17 @@ public class Candlestick extends Model<String> {
 
     private String period;
 
+//    @TableField("`count`")
     private Integer count;
 
     private String amount;
-
+//    @TableField("`open`")
     private BigDecimal open;
-
+//    @TableField("`close`")
     private BigDecimal close;
-
+//    @TableField("`low`")
     private BigDecimal low;
-
+//    @TableField("`high`")
     private BigDecimal high;
 
     private String vol;

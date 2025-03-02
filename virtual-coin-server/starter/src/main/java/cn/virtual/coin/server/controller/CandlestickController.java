@@ -26,6 +26,6 @@ public class CandlestickController {
 
     @GetMapping
     public List<Candlestick> query(@RequestParam("symbol") String symbol, @RequestParam("period") String period){
-        return candlestickService.select(Wrappers.<Candlestick>lambdaQuery().eq(Candlestick::getSymbol,symbol).eq(Candlestick::getPeriod,period));
+        return candlestickService.select(Wrappers.<Candlestick>lambdaQuery().eq(Candlestick::getSymbol,symbol).eq(Candlestick::getPeriod,period).eq(Candlestick::getIndicator, "123"));
     }
 }

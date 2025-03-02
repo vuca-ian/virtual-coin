@@ -94,13 +94,13 @@ CREATE TABLE IF NOT EXISTS t_candlestick_ethusdt_1min
 COMMENT ON TABLE t_candlestick_ethusdt_1min IS 'K线烛台';
 COMMENT ON COLUMN t_candlestick_ethusdt_1min.symbol IS '符号';
 COMMENT ON COLUMN t_candlestick_ethusdt_1min.period IS '周期';
-COMMENT ON COLUMN t_candlestick_ethusdt_1min.count IS '数量';
-COMMENT ON COLUMN t_candlestick_ethusdt_1min.amount IS '总量';
-COMMENT ON COLUMN t_candlestick_ethusdt_1min.open IS '开始';
-COMMENT ON COLUMN t_candlestick_ethusdt_1min.close IS '结束';
-COMMENT ON COLUMN t_candlestick_ethusdt_1min.low IS '低';
-COMMENT ON COLUMN t_candlestick_ethusdt_1min.high IS '高';
-COMMENT ON COLUMN t_candlestick_ethusdt_1min.vol IS '量';
+COMMENT ON COLUMN t_candlestick_ethusdt_1min.count IS '成交笔数';
+COMMENT ON COLUMN t_candlestick_ethusdt_1min.amount IS '成交量';
+COMMENT ON COLUMN t_candlestick_ethusdt_1min.open IS '开盘价';
+COMMENT ON COLUMN t_candlestick_ethusdt_1min.close IS '收盘价（当K线为最晚的一根时，是最新成交价）';
+COMMENT ON COLUMN t_candlestick_ethusdt_1min.low IS '最低价';
+COMMENT ON COLUMN t_candlestick_ethusdt_1min.high IS '最高价';
+COMMENT ON COLUMN t_candlestick_ethusdt_1min.vol IS '成交额, 即 sum(每一笔成交价 * 该笔的成交量)';
 COMMENT ON COLUMN t_candlestick_ethusdt_1min.analysis IS '分析';
 COMMENT ON COLUMN t_candlestick_ethusdt_1min.indicator IS '指标';
 

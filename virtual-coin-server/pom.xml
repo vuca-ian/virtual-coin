@@ -42,4 +42,18 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version> <!-- 使用最新的版本 -->
+                <configuration>
+                    <source>21</source> <!-- 源代码兼容的Java版本 -->
+                    <target>21</target> <!-- 目标字节码兼容的Java版本 -->
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

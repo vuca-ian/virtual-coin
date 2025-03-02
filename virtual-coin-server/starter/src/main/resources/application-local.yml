@@ -20,6 +20,7 @@ server.websocket.enabled: false
 sharding.rule:
   symbols: [ethusdt]
   tables:
-    - logic-table: t_candlestick
-      actual-columns: [symbol, period]
-      actual-tables: [master.t_candlestick_symbol_1min]
+    logic-table: t_candlestick
+    algorithm-columns: [symbol, period]
+    actual-tables: [t_candlestick_symbol_1min]
+
