@@ -27,12 +27,6 @@
             <artifactId>vuca-cloud-dal</artifactId>
         </dependency>
         <dependency>
-            <groupId>cn.virtual.coin</groupId>
-            <artifactId>broker</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-jsqlparser</artifactId>
             <version>3.5.9</version>

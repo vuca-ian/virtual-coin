@@ -7,6 +7,7 @@ public enum ConnectionState {
      */
     IDLE,
     DELAY_CONNECT,
+    CONNECTING,
     CONNECTED,
     CLOSED_ON_ERROR
 }

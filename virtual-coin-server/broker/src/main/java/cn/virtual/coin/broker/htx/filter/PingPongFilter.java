@@ -5,11 +5,13 @@ import cn.virtual.coin.websocket.WebSocketConnection;
 import cn.virtual.coin.websocket.chain.Filter;
 import cn.virtual.coin.websocket.chain.FilterChain;
 import com.alibaba.fastjson.JSONObject;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author gdyang
  * @since 2021/8/2 10:43 上午
  */
+@Slf4j
 public class PingPongFilter implements Filter<JSONObject> {
     private static final String PING = "ping";
     @Override

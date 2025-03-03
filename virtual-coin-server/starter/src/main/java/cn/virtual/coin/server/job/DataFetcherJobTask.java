@@ -4,6 +4,7 @@ import cn.virtual.coin.broker.htx.utils.CandlestickInterval;
 import cn.virtual.coin.domain.dal.po.JobHistory;
 import cn.virtual.coin.domain.service.IJobHistoryService;
 import cn.virtual.coin.server.configuration.JobTask;
+import cn.virtual.coin.websocket.ConnectionState;
 import cn.virtual.coin.websocket.WebSocketConnection;
 import com.alibaba.fastjson.JSONObject;
 import jakarta.annotation.Resource;
@@ -30,7 +31,7 @@ import java.util.Arrays;
 @Slf4j
 @Data
 @RequiredArgsConstructor
-@JobTask(name = "DataFetcher", cron = "0 0/1 * * * ?", condition = "server.websocket.enabled", havingValue = "true")
+@JobTask(name = "DataFetcher", cron = "0 0/1 * * * ?")
 public class DataFetcherJobTask extends QuartzJobBean {
     public static final String WEBSOCKET_CANDLESTICK_TOPIC = "market.$symbol$.kline.$period$";
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH");
@@ -45,6 +46,9 @@ public class DataFetcherJobTask extends QuartzJobBean {
     private WebSocketConnection connection;
     @Override
     protected void executeInternal(@NonNull JobExecutionContext context) throws JobExecutionException {
+        if(connection.getState() != ConnectionState.CONNECTED){
+            return;
+        }
         log.info("start fetch history data.");
         if(null == supportSymbol || supportSymbol.length == 0){
             return;
@@ -53,8 +57,7 @@ public class DataFetcherJobTask extends QuartzJobBean {
     }
 
     private void fetch(String symbol){
-//        Arrays.stream(CandlestickInterval.values()).forEach(interval -> fetch(symbol, interval));
-        fetch(symbol, CandlestickInterval.MIN1);
+        Arrays.stream(CandlestickInterval.values()).forEach(interval -> fetch(symbol, interval));
     }
 
     private void fetch(String symbol, CandlestickInterval interval){

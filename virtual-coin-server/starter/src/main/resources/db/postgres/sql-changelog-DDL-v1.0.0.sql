@@ -77,18 +77,18 @@ COMMENT ON COLUMN t_job_history.loop_count IS '遍历次数';
 
 CREATE TABLE IF NOT EXISTS t_candlestick_ethusdt_1min
 (
-    id VARCHAR(32) NOT NULL,
-    symbol VARCHAR(32) NOT NULL,
-    period VARCHAR(32) NOT NULL,
-    count varchar(20) NOT NULL,
-    amount VARCHAR(32) NOT NULL,
-    open decimal(8,4) NOT NULL,
-    close decimal(8,4) NOT NULL,
-    low decimal(8,4) NOT NULL,
-    high decimal(8,4) NOT NULL,
-    vol VARCHAR(32) NOT NULL,
-    analysis VARCHAR(32)  NULL,
-    indicator VARCHAR(32)  NULL,
+    id BIGINT NOT NULL,
+    symbol VARCHAR(20) NOT NULL,
+    period VARCHAR(10) NOT NULL,
+    count decimal(10,4) NOT NULL,
+    amount decimal(10,5) NOT NULL,
+    open decimal(10,4) NOT NULL,
+    close decimal(10,4) NOT NULL,
+    low decimal(10,4) NOT NULL,
+    high decimal(10,4) NOT NULL,
+    vol decimal(10,5) NOT NULL,
+    analysis text  NULL,
+    indicator text  NULL,
     primary key (id)
 );
 COMMENT ON TABLE t_candlestick_ethusdt_1min IS 'K线烛台';

@@ -1,11 +1,14 @@
 package cn.virtual.coin.broker.htx;
 
+import cn.virtual.coin.broker.htx.utils.CandlestickInterval;
+import cn.virtual.coin.broker.htx.utils.ServiceException;
 import cn.virtual.coin.websocket.WebSocketConnection;
 import cn.virtual.coin.websocket.WebSocketHandler;
 import cn.virtual.coin.websocket.chain.FilterContext;
 import cn.virtual.coin.websocket.chain.WebSocketFilterChain;
 import cn.virtual.coin.websocket.code.Encoder;
 import com.alibaba.fastjson.JSONObject;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -15,10 +18,11 @@ import org.springframework.stereotype.Service;
  */
 @Slf4j
 public class HuobiWebSocketHandler implements WebSocketHandler<String>, Encoder {
-    private final FilterContext filterContext;
+    private final FilterContext<?> filterContext;
+    @Setter
     private boolean enabledSubscribe;
 
-    public HuobiWebSocketHandler(FilterContext filterContext) {
+    public HuobiWebSocketHandler(FilterContext<?> filterContext) {
         this.filterContext = filterContext;
     }
 
@@ -34,14 +38,14 @@ public class HuobiWebSocketHandler implements WebSocketHandler<String>, Encoder 
         try {
             filterChain.doFilter(JSONObject.parseObject(data), connection);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new ServiceException("ws解析数据异常", e);
         }
     }
 
     @Override
     public void onOpen(WebSocketConnection connection) {
-//        if(enabledSubscribe){
-//            connection.send(subTopic(CandlestickRequest.CandlestickInterval.MIN1));
+        if(enabledSubscribe){
+            connection.send(subTopic(CandlestickInterval.MIN1));
 //            connection.send(subTopic(CandlestickRequest.CandlestickInterval.MIN5));
 //            connection.send(subTopic(CandlestickRequest.CandlestickInterval.MIN15));
 //            connection.send(subTopic(CandlestickRequest.CandlestickInterval.MIN30));
@@ -51,7 +55,7 @@ public class HuobiWebSocketHandler implements WebSocketHandler<String>, Encoder 
 //            connection.send(subTopic(CandlestickRequest.CandlestickInterval.MON1));
 //            connection.send(subTopic(CandlestickRequest.CandlestickInterval.WEEK1));
 //            connection.send(subTopic(CandlestickRequest.CandlestickInterval.YEAR1));
-//        }
+        }
     }
 
     @Override
@@ -67,20 +71,17 @@ public class HuobiWebSocketHandler implements WebSocketHandler<String>, Encoder 
         return JSONObject.toJSONString(data);
     }
     public static final String WEBSOCKET_CANDLESTICK_TOPIC = "market.$symbol$.kline.$period$";
-//
-//    private JSONObject subTopic(CandlestickRequest.CandlestickInterval interval){
-//        String topic = WEBSOCKET_CANDLESTICK_TOPIC
-//                .replace("$symbol$", "ethusdt")
-//                .replace("$period$", interval.getCode());
-//
-//        JSONObject command = new JSONObject();
-//        command.put("sub", topic);
-//        command.put("id", System.nanoTime());
-//        log.info("[Connection Send]{}", command);
-//        return command;
-//    }
 
-    public void setEnabledSubscribe(boolean enabledSubscribe) {
-        this.enabledSubscribe = enabledSubscribe;
+    private JSONObject subTopic(CandlestickInterval interval){
+        String topic = WEBSOCKET_CANDLESTICK_TOPIC
+                .replace("$symbol$", "ethusdt")
+                .replace("$period$", interval.getCode());
+
+        JSONObject command = new JSONObject();
+        command.put("sub", topic);
+        command.put("id", System.nanoTime());
+        log.info("[Connection Send]{}", command);
+        return command;
     }
+
 }

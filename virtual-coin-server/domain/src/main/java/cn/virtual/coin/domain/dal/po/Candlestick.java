@@ -11,6 +11,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * cn.virtual.coin.domain.dal.po
@@ -22,10 +23,10 @@ import java.math.BigDecimal;
 @TableName("t_candlestick")
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class Candlestick extends Model<String> {
+public class Candlestick extends Model<Long> {
 
     @TableId(type = IdType.ASSIGN_ID)
-    private String id;
+    private Long id;
 
     private String symbol;
 
@@ -45,6 +46,8 @@ public class Candlestick extends Model<String> {
 
 
     private String indicator;
+
+    private Long openTime;
 
     public Candlestick(BigDecimal close) {
         this.close = close;

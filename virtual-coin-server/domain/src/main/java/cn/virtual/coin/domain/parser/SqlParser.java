@@ -18,6 +18,7 @@ import net.sf.jsqlparser.statement.select.FromItem;
 import net.sf.jsqlparser.statement.select.ParenthesedFromItem;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
+import net.sf.jsqlparser.statement.update.Update;
 import org.apache.ibatis.binding.MapperMethod;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.SqlCommandType;
@@ -70,6 +71,10 @@ public class SqlParser extends JsqlParserSupport {
         MetaObject object = configuration.newMetaObject(obj);
         Table table = insert.getTable();
         table.setName(this.complexShardingTableAlgorithm.doSharding(table.getName(), object));
+    }
+
+    protected void processUpdate(Update update, int index, String sql, Object obj) {
+
     }
 
     @Override

@@ -26,8 +26,8 @@ public class AccountController {
         userAccessService.saveOrUpdateUser(userAccess);
     }
 
-    @GetMapping
-    public AccountModel getAccount(@RequestParam("userName") String userName){
-        return accountService.getAccount(userName);
-    }
+//    @GetMapping
+//    public AccountModel getAccount(@RequestParam("userName") String userName){
+//        return accountService.getAccount(userName);
+//    }
 }

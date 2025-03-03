@@ -13,7 +13,7 @@ spring:
       idle-timeout: 540000
       connection-test-query: SELECT 1
 
-server.websocket.enabled: false
+server.websocket.enabled: true
 
 sharding.rule:
   symbols: [ethusdt]

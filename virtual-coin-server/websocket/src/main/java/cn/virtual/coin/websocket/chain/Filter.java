@@ -9,4 +9,9 @@ import cn.virtual.coin.websocket.WebSocketConnection;
 public interface Filter<T> {
 
     void doFilter(T data, WebSocketConnection connection, FilterChain chain);
+
+
+    default boolean supports(T data){
+        return true;
+    }
 }

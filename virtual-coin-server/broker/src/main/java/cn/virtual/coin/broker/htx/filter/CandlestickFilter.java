@@ -1,7 +1,10 @@
 package cn.virtual.coin.broker.htx.filter;
 
 import cn.virtual.coin.broker.htx.utils.CandlestickInterval;
+import cn.virtual.coin.broker.htx.utils.ServiceException;
 import cn.virtual.coin.broker.htx.utils.WebSocketConstants;
+import cn.virtual.coin.domain.dal.po.Candlestick;
+import cn.virtual.coin.domain.service.ICandlestickService;
 import cn.virtual.coin.websocket.WebSocketConnection;
 import cn.virtual.coin.websocket.chain.Filter;
 import cn.virtual.coin.websocket.chain.FilterChain;
@@ -9,10 +12,8 @@ import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
-
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author gdyang
@@ -25,6 +26,7 @@ public class CandlestickFilter implements Filter<JSONObject>, ApplicationEventPu
 //    private final Map<String, Object> PERIOD = new ConcurrentHashMap<>();
 //    private final Map<String, Candlestick> candlestickMap = new ConcurrentHashMap<>();
     private ApplicationEventPublisher applicationEventPublisher;
+    private ICandlestickService candlestickService;
     @Override
     public void doFilter(JSONObject data, WebSocketConnection connection, FilterChain chain) {
         if(data.containsKey(WebSocketConstants.CH) && data.getString(WebSocketConstants.CH).contains(WebSocketConstants.K_LINE)){
@@ -34,11 +36,14 @@ public class CandlestickFilter implements Filter<JSONObject>, ApplicationEventPu
                 CandlestickInterval interval = CandlestickInterval.accept(type);
                 String symbol = ch.substring(7, ch.indexOf(WebSocketConstants.K_LINE) - 1);
                 JSONObject tick = data.getJSONObject(WebSocketConstants.TICK);
-                log.info("tick:{}", tick);
-//                Candlestick candlestick = tick.toJavaObject(Candlestick.class);
-//                candlestick.setSymbol(symbol);
-////                candlestick.setOpenTime(candlestick.getId() * 1000);
-//                candlestick.setPeriod(interval.getCode());
+                Candlestick candlestick = tick.toJavaObject(Candlestick.class);
+                candlestick.setSymbol(symbol);
+                candlestick.setOpenTime(candlestick.getId() * 1000);
+                candlestick.setPeriod(interval.getCode());
+                log.info("tick:{}", candlestick);
+                candlestick.setIndicator("12");
+                candlestick.setAnalysis("123");
+                candlestickService.save(candlestick);
 //                if(!PERIOD.containsKey(interval.getCode())){
 //                    PERIOD.put(interval.getCode(), candlestick.getId());
 //                }
@@ -55,14 +60,14 @@ public class CandlestickFilter implements Filter<JSONObject>, ApplicationEventPu
 //                candlestickMap.put(key, candlestick);
                 return;
             }catch (Exception e){
-                e.printStackTrace();
+                throw new ServiceException("查询失败！",e);
             }
         }
         chain.doFilter(data, connection);
     }
 
     @Override
-    public void setApplicationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
+    public void setApplicationEventPublisher(@NonNull ApplicationEventPublisher applicationEventPublisher) {
         this.applicationEventPublisher = applicationEventPublisher;
     }
 }

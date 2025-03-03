@@ -27,4 +27,9 @@ public class JobHistory extends Model<String> {
     private String lastDataTime;
 
     private Integer loopCount;
+
+    public JobHistory(String symbol, String period) {
+        this.symbol = symbol;
+        this.period = period;
+    }
 }

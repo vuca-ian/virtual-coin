@@ -78,7 +78,7 @@ public class WebSocketClientConnection extends WebSocketListener implements WebS
         state = ConnectionState.CONNECTED;
         if(options.authentic() && null != authenticManage){
             Object data = authenticManage.authentic(options);
-            log.info("authentic data: {}", data);
+            log.debug("authentic data: {}", data);
             send(encoder.encode(data));
         }
         webSocketHandler.onOpen(this);
@@ -111,16 +111,18 @@ public class WebSocketClientConnection extends WebSocketListener implements WebS
     @Override
     public void connect() {
         if(ConnectionState.CONNECTED == state){
-            log.warn("[Connection][" + this.getConnectionId() + "] Already connected, {}", webSocket);
+            log.warn("[Connection][{}] Already connected, {}", this.getConnectionId(), webSocket);
             return;
         }
         if(delay >0){
             delay--;
             return;
         }
+        this.state = ConnectionState.CONNECTING;
         String url = this.options.getHost() + this.options.getPath();
         log.info("[Connection][{}] Connecting to {}", getConnectionId(), url);
         this.webSocket = OkHttpUtils.buildWebSocket(url, this);
+        WebSocketWatchDog.onConnected(this);
     }
 
     @Override

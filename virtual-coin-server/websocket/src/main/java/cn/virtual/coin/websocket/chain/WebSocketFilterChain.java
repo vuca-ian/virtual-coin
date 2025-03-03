@@ -49,7 +49,11 @@ public class WebSocketFilterChain implements FilterChain{
             try {
                 log.debug("data:{}", data);
                 Filter<T> filter = filterConfig.getFilter();
-                filter.doFilter(data, connection, this);
+                if(filter.supports(data)){
+                    filter.doFilter(data, connection, this);
+                }else{
+                    this.doFilter(data, connection);
+                }
             }catch (Exception e){
                 throw new WebSocketException("FilterChain.filter is stoped due to error", e);
             }

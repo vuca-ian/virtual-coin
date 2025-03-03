@@ -27,11 +27,11 @@
             <artifactId>websocket</artifactId>
             <version>${project.version}</version>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>cn.vuca.cloud</groupId>-->
-<!--            <artifactId>vuca-commons</artifactId>-->
-<!--            <version>1.0.0-SNAPSHOT</version>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>cn.virtual.coin</groupId>
+            <artifactId>domain</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <dependency>
             <groupId>cn.vuca.cloud</groupId>
             <artifactId>vuca-cloud-commons</artifactId>

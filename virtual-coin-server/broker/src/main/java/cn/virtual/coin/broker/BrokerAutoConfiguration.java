@@ -40,15 +40,19 @@ public class BrokerAutoConfiguration {
         }
 
         @Bean
-        @ConditionalOnBean(FilterContext.class)
-        public HuobiWebSocketHandler huobiWebSocketHandler(@Autowired(required = false) FilterContext filterContext){
+        public WebSocketHandler<String> huobiWebSocketHandler(@Autowired(required = false) FilterContext<?> filterContext){
             return new HuobiWebSocketHandler(filterContext);
         }
 
         @Bean("ws_v1")
         @ConditionalOnBean(WebSocketAuthenticManage.class)
         public WebSocketConnection webSocketConnection (@Autowired(required = false) WebSocketHandler<String> handler,@Autowired(required = false) WebSocketAuthenticManage authenticManage) throws Exception {
-            return new WebSocketConnectionFactoryBean((HuobiWebSocketHandler) handler, authenticManage, new HuobiOptions(HOST, PATH), true).getObject();
+            return new WebSocketConnectionFactoryBean((HuobiWebSocketHandler) handler, authenticManage, new HuobiOptions(HOST, PATH, false), true).getObject();
+        }
+
+        @Bean
+        public CandlestickHistoryFilter candlestickHistoryFilter(){
+            return new CandlestickHistoryFilter();
         }
 
         @Bean
@@ -57,7 +61,7 @@ public class BrokerAutoConfiguration {
             FilterContext context = new FilterContext<>();
             context.addFilterConfig("ping", new PingPongFilter());
             context.addFilterConfig("candlestick", candlestickFilter);
-    //        context.addFilterConfig("candlestickHistory", candlestickHistoryFilter());
+            context.addFilterConfig("candlestickHistory", candlestickHistoryFilter());
             context.addFilterConfig("subbed", new SubbedFilter());
             context.addFilterConfig("auth", new ActionFilter());
             context.addFilterConfig("orderSub", new OrderSubFilter());
