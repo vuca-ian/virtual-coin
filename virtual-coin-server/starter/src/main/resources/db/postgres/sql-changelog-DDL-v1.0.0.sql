@@ -87,8 +87,8 @@ CREATE TABLE IF NOT EXISTS t_candlestick_ethusdt_1min
     low decimal(8,4) NOT NULL,
     high decimal(8,4) NOT NULL,
     vol VARCHAR(32) NOT NULL,
-    analysis VARCHAR(32) NOT NULL,
-    indicator VARCHAR(32) NOT NULL,
+    analysis VARCHAR(32)  NULL,
+    indicator VARCHAR(32)  NULL,
     primary key (id)
 );
 COMMENT ON TABLE t_candlestick_ethusdt_1min IS 'K线烛台';

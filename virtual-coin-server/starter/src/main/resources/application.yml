@@ -29,17 +29,12 @@ springdoc:
     enabled: true
     groups:
       enabled: true
-    title: Mini Server
 vuca:
   trace:
     enabled: true
     excludes:
-  license:
-    projectName: vuca-cloud
-    keystore: public_key.pem
 knife4j:
   setting:
-    footer-custom-content: aaaaaaaa
     enable-footer: true
 quartz:
   job:

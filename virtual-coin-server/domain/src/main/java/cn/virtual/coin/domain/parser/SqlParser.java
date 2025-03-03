@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
+import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
 import net.sf.jsqlparser.expression.operators.relational.ParenthesedExpressionList;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
@@ -20,7 +21,10 @@ import net.sf.jsqlparser.statement.select.Select;
 import org.apache.ibatis.binding.MapperMethod;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.SqlCommandType;
+import org.apache.ibatis.reflection.MetaObject;
+import org.apache.ibatis.session.Configuration;
 
+import java.io.ObjectInputFilter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -43,11 +47,13 @@ public class SqlParser extends JsqlParserSupport {
     private final Object parameter;
 
     private final ComplexShardingTableAlgorithm  complexShardingTableAlgorithm;
+    private final Configuration configuration;
 
     public SqlParser(PluginUtils.MPBoundSql boundSql, MappedStatement ms, Object parameter, ComplexShardingTableAlgorithm  complexShardingTableAlgorithm) {
         this.boundSql = boundSql;
         this.ms = ms;
         this.parameter = parameter;
+        this.configuration = ms.getConfiguration();
         this.complexShardingTableAlgorithm = complexShardingTableAlgorithm;
     }
 
@@ -60,8 +66,10 @@ public class SqlParser extends JsqlParserSupport {
     }
 
     protected void processInsert(Insert insert, int index, String sql, Object obj) {
-//        List<Column> columns = insert.getColumns();
-//        ExpressionList expressionList = insert.getColumns();
+        List<Column> columns = insert.getColumns();
+        MetaObject object = configuration.newMetaObject(obj);
+        Table table = insert.getTable();
+        table.setName(this.complexShardingTableAlgorithm.doSharding(table.getName(), object));
     }
 
     @Override
@@ -98,7 +106,7 @@ public class SqlParser extends JsqlParserSupport {
         MapperMethod.ParamMap<?> paramMap = (MapperMethod.ParamMap<?>) obj;
         Map<String, Object> parameter = new HashMap<>();
         parserExpression(currentExpression, paramMap, parameter);
-        tables.forEach(t -> t.setName(this.complexShardingTableAlgorithm.doSharding(t.getName(), parameter)));
+        tables.forEach(t -> t.setName(this.complexShardingTableAlgorithm.doSharding(t.getName(), configuration.newMetaObject(parameter))));
         return currentExpression;
     }
 

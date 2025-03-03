@@ -1,5 +1,6 @@
 package cn.virtual.coin.domain.sharding;
 
+import org.apache.ibatis.reflection.MetaObject;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
@@ -18,8 +19,8 @@ public class ComplexShardingTableAlgorithm {
         this.property = property;
     }
 
-    public String doSharding(String tableName, Map<String, Object> parameters) {
-        String a = Arrays.stream(property.getAlgorithmColumns()).filter(parameters::containsKey).map(parameters::get).map(Object::toString).collect(Collectors.joining("_"));
+    public String doSharding(String tableName, MetaObject parameters) {
+        String a = Arrays.stream(property.getAlgorithmColumns()).map(parameters::getValue).map(Object::toString).collect(Collectors.joining("_"));
         return tableName.equals(property.getLogicTable()) ? tableName + "_" + a : tableName;
     }
 }

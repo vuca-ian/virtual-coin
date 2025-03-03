@@ -31,17 +31,12 @@ public class Candlestick extends Model<String> {
 
     private String period;
 
-//    @TableField("`count`")
     private Integer count;
 
     private String amount;
-//    @TableField("`open`")
     private BigDecimal open;
-//    @TableField("`close`")
     private BigDecimal close;
-//    @TableField("`low`")
     private BigDecimal low;
-//    @TableField("`high`")
     private BigDecimal high;
 
     private String vol;
