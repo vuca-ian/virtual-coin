@@ -130,9 +130,13 @@ public class SqlParser extends JsqlParserSupport {
         if (CollectionUtils.isEmpty(tables)) {
             return currentExpression;
         }
+        if(null == currentExpression){
+            return null;
+        }
         MapperMethod.ParamMap<?> paramMap = (MapperMethod.ParamMap<?>) obj;
         Map<String, Object> parameter = new HashMap<>();
         parserExpression(currentExpression, paramMap, parameter);
+
         tables.forEach(t -> t.setName(this.complexShardingTableAlgorithm.doSharding(t.getName(), configuration.newMetaObject(parameter))));
         return currentExpression;
     }

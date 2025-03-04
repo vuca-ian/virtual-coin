@@ -43,14 +43,13 @@ public class CandlestickHistoryFilter implements Filter<JSONObject>, Application
                 String type = ch.substring(ch.lastIndexOf(".") + 1);
                 CandlestickInterval interval = CandlestickInterval.accept(type);
                 String symbol = ch.substring(7, ch.indexOf("kline") - 1);
-                log.info("{}, {}, {}", symbol, type, list);
+//                log.info("{}, {}, {}", symbol, type, list);
 
                     executor.execute(()-> {
                         if(CollectionUtils.isNotEmpty(list)){
                             list.forEach(candlestick -> {
                                 candlestick.setSymbol(symbol);
                                 candlestick.setPeriod(interval.getCode());
-                                candlestick.setOpenTime(candlestick.getId() * 1000);
                                 candlestickService.saveCandlestick(candlestick);
                             });
                             applicationEventPublisher.publishEvent(new CandlestickEvent(new JobHistory(symbol, interval.getCode()), CandlestickEvent.EventType.batch));

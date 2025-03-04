@@ -5,6 +5,7 @@ import cn.virtual.coin.broker.htx.indicator.IndicatorAlgorithm;
 import cn.virtual.coin.broker.htx.indicator.IndicatorFactory;
 import cn.virtual.coin.broker.htx.indicator.algorithm.MacdIndicatorAlgorithm;
 import cn.virtual.coin.broker.htx.utils.CollectionUtils;
+import cn.virtual.coin.broker.htx.utils.ServiceException;
 import cn.virtual.coin.domain.dal.po.Candlestick;
 import cn.virtual.coin.domain.dal.po.Indicator;
 import cn.virtual.coin.domain.dal.po.JobHistory;
@@ -58,14 +59,23 @@ public class IndicatorJobTask extends QuartzJobBean {
     private Executor executor;
     @Override
     protected void executeInternal(@NonNull JobExecutionContext context) throws JobExecutionException {
-        log.info("任务开始执行。。。");
+        List<JobHistory> history = jobHistoryService.select(Wrappers.emptyWrapper());
+        if (!CollectionUtils.isNotEmpty(history)) {
+            return;
+        }
+        List<Indicator> indicators = indicatorService.select(Wrappers.query());
+        if(!CollectionUtils.isNotEmpty(indicators)){
+            return;
+        }
+        log.info("job history task: {}, {}", history, indicators.stream().map(Indicator::getIndicator).collect(Collectors.joining(",")));
+        history.forEach(job -> run(job, indicators));
     }
 
 
     @SuppressWarnings("unchecked")
     private void run(JobHistory job, List<Indicator> indicators) {
         AtomicInteger counter = new AtomicInteger(job.getLoopCount());
-        AtomicLong lastDataId = new AtomicLong(job.getLastDataId());
+        AtomicLong lastDataId = new AtomicLong(null == job.getLastDataId() ? 0L : job.getLastDataId());
         while (counter.getAndDecrement() > 0) {
             CountDownLatch latch = new CountDownLatch(indicators.size());
             try {
@@ -101,7 +111,7 @@ public class IndicatorJobTask extends QuartzJobBean {
 //                candlestickService.update(tick, Wrappers.<Candlestick>lambdaUpdate().eq(Candlestick::getSymbol, job.getSymbol())
 //                        .eq(Candlestick::getPeriod, job.getPeriod()).eq(Candlestick::getId, tick.getId()));
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                throw new ServiceException("计算指标异常", e);
             }
         }
         job.setLastDataId(lastDataId.get());

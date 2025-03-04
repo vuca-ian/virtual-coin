@@ -55,16 +55,9 @@ public class HuobiWebSocketHandler implements WebSocketHandler<String>, Encoder,
     @Override
     public void onOpen(WebSocketConnection connection) {
         if(enabledSubscribe){
-//            connection.send(subTopic(CandlestickInterval.MIN1));
-//            connection.send(subTopic(CandlestickRequest.CandlestickInterval.MIN5));
-//            connection.send(subTopic(CandlestickRequest.CandlestickInterval.MIN15));
-//            connection.send(subTopic(CandlestickRequest.CandlestickInterval.MIN30));
-//            connection.send(subTopic(CandlestickRequest.CandlestickInterval.MIN60));
-//            connection.send(subTopic(CandlestickRequest.CandlestickInterval.HOUR4));
-//            connection.send(subTopic(CandlestickRequest.CandlestickInterval.DAY1));
-//            connection.send(subTopic(CandlestickRequest.CandlestickInterval.MON1));
-//            connection.send(subTopic(CandlestickRequest.CandlestickInterval.WEEK1));
-//            connection.send(subTopic(CandlestickRequest.CandlestickInterval.YEAR1));
+            Arrays.stream(collectorProperties.getSymbols()).forEach(symbol ->
+                    Arrays.stream(CandlestickInterval.values()).forEach(interval ->
+                            connection.send(subTopic(symbol, interval))));
         }
     }
 
@@ -82,9 +75,9 @@ public class HuobiWebSocketHandler implements WebSocketHandler<String>, Encoder,
     }
     public static final String WEBSOCKET_CANDLESTICK_TOPIC = "market.$symbol$.kline.$period$";
 
-    private JSONObject subTopic(CandlestickInterval interval){
+    private JSONObject subTopic(String symbol, CandlestickInterval interval){
         String topic = WEBSOCKET_CANDLESTICK_TOPIC
-                .replace("$symbol$", "ethusdt")
+                .replace("$symbol$", symbol)
                 .replace("$period$", interval.getCode());
 
         JSONObject command = new JSONObject();

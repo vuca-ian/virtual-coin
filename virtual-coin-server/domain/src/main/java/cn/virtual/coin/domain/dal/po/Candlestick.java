@@ -47,7 +47,6 @@ public class Candlestick extends Model<Long> {
 
     private String indicator;
 
-    private Long openTime;
 
     public Candlestick(BigDecimal close) {
         this.close = close;

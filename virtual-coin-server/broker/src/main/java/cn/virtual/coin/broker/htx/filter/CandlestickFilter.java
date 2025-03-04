@@ -40,12 +40,9 @@ public class CandlestickFilter implements Filter<JSONObject>, ApplicationEventPu
                 JSONObject tick = data.getJSONObject(WebSocketConstants.TICK);
                 Candlestick candlestick = tick.toJavaObject(Candlestick.class);
                 candlestick.setSymbol(symbol);
-                candlestick.setOpenTime(candlestick.getId() * 1000);
+//                candlestick.setOpenTime(candlestick.getId() * 1000);
                 candlestick.setPeriod(interval.getCode());
-                log.info("tick:{}", candlestick);
-                candlestick.setIndicator("12");
-                candlestick.setAnalysis("123");
-                candlestickService.save(candlestick);
+                candlestickService.saveCandlestick(candlestick);
 //                if(!PERIOD.containsKey(interval.getCode())){
 //                    PERIOD.put(interval.getCode(), candlestick.getId());
 //                }
