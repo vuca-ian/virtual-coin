@@ -2,7 +2,7 @@ package cn.virtual.coin.broker.htx.utils;
 
 /**
  * @author gdyang
- * @date 2021/8/1 4:53 下午
+ * @since 2021/8/1 4:53 下午
  */
 public interface WebSocketConstants {
 

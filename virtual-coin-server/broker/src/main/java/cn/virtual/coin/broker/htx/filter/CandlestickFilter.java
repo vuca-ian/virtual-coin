@@ -9,6 +9,7 @@ import cn.virtual.coin.websocket.WebSocketConnection;
 import cn.virtual.coin.websocket.chain.Filter;
 import cn.virtual.coin.websocket.chain.FilterChain;
 import com.alibaba.fastjson.JSONObject;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
@@ -17,16 +18,17 @@ import org.springframework.stereotype.Service;
 
 /**
  * @author gdyang
- * @date 2021/8/2 10:44 上午
+ * @since 2021/8/2 10:44 上午
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class CandlestickFilter implements Filter<JSONObject>, ApplicationEventPublisherAware {
 
 //    private final Map<String, Object> PERIOD = new ConcurrentHashMap<>();
 //    private final Map<String, Candlestick> candlestickMap = new ConcurrentHashMap<>();
     private ApplicationEventPublisher applicationEventPublisher;
-    private ICandlestickService candlestickService;
+    private final ICandlestickService candlestickService;
     @Override
     public void doFilter(JSONObject data, WebSocketConnection connection, FilterChain chain) {
         if(data.containsKey(WebSocketConstants.CH) && data.getString(WebSocketConstants.CH).contains(WebSocketConstants.K_LINE)){

@@ -10,4 +10,5 @@ import cn.vuca.cloud.dal.service.BaseService;
  * @since 2025/2/27 15:04
  */
 public interface ICandlestickService extends BaseService<Candlestick> {
+    void saveCandlestick(Candlestick candlestick);
 }

@@ -10,6 +10,7 @@ import cn.virtual.coin.websocket.WebSocketConnection;
 import cn.virtual.coin.websocket.chain.Filter;
 import cn.virtual.coin.websocket.chain.FilterChain;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -43,14 +44,18 @@ public class CandlestickHistoryFilter implements Filter<JSONObject>, Application
                 CandlestickInterval interval = CandlestickInterval.accept(type);
                 String symbol = ch.substring(7, ch.indexOf("kline") - 1);
                 log.info("{}, {}, {}", symbol, type, list);
-                executor.execute(()-> {
-                    list.forEach(candlestick -> {
-                        candlestick.setSymbol(symbol);
-                        candlestick.setPeriod(interval.getCode());
+
+                    executor.execute(()-> {
+                        if(CollectionUtils.isNotEmpty(list)){
+                            list.forEach(candlestick -> {
+                                candlestick.setSymbol(symbol);
+                                candlestick.setPeriod(interval.getCode());
+                                candlestick.setOpenTime(candlestick.getId() * 1000);
+                                candlestickService.saveCandlestick(candlestick);
+                            });
+                            applicationEventPublisher.publishEvent(new CandlestickEvent(new JobHistory(symbol, interval.getCode()), CandlestickEvent.EventType.batch));
+                        }
                     });
-                    candlestickService.saveBatch(list);
-                    applicationEventPublisher.publishEvent(new CandlestickEvent(new JobHistory(symbol, interval.getCode()), CandlestickEvent.EventType.batch));
-                });
             } catch (Exception e) {
                 log.error("request candlestick error", e);
                 throw new RuntimeException(e);

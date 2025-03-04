@@ -16,9 +16,12 @@ spring:
 server.websocket.enabled: true
 
 sharding.rule:
-  symbols: [ethusdt]
   tables:
     logic-table: t_candlestick
     algorithm-columns: [symbol, period]
     actual-tables: [t_candlestick_symbol_1min]
 
+coin.collector:
+  symbols: [ethusdt]
+  dialect: postgresql
+  logic-table: t_candlestick

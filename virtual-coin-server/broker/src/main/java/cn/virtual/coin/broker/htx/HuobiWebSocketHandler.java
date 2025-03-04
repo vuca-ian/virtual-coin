@@ -2,6 +2,8 @@ package cn.virtual.coin.broker.htx;
 
 import cn.virtual.coin.broker.htx.utils.CandlestickInterval;
 import cn.virtual.coin.broker.htx.utils.ServiceException;
+import cn.virtual.coin.broker.property.CollectorProperties;
+import cn.virtual.coin.broker.service.DatabaseInitializeHandler;
 import cn.virtual.coin.websocket.WebSocketConnection;
 import cn.virtual.coin.websocket.WebSocketHandler;
 import cn.virtual.coin.websocket.chain.FilterContext;
@@ -10,20 +12,28 @@ import cn.virtual.coin.websocket.code.Encoder;
 import com.alibaba.fastjson.JSONObject;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Service;
+
+import javax.sql.DataSource;
+import java.util.Arrays;
 
 /**
  * @author gdyang
  * @since 2025/2/26 23:30
  */
 @Slf4j
-public class HuobiWebSocketHandler implements WebSocketHandler<String>, Encoder {
+public class HuobiWebSocketHandler implements WebSocketHandler<String>, Encoder, InitializingBean {
     private final FilterContext<?> filterContext;
     @Setter
     private boolean enabledSubscribe;
 
-    public HuobiWebSocketHandler(FilterContext<?> filterContext) {
+    private final CollectorProperties collectorProperties;
+    private final DatabaseInitializeHandler databaseInitializeHandler;
+    public HuobiWebSocketHandler(FilterContext<?> filterContext, DatabaseInitializeHandler databaseInitializeHandler, CollectorProperties collectorProperties) {
         this.filterContext = filterContext;
+        this.databaseInitializeHandler = databaseInitializeHandler;
+        this.collectorProperties = collectorProperties;
     }
 
     /**
@@ -45,7 +55,7 @@ public class HuobiWebSocketHandler implements WebSocketHandler<String>, Encoder 
     @Override
     public void onOpen(WebSocketConnection connection) {
         if(enabledSubscribe){
-            connection.send(subTopic(CandlestickInterval.MIN1));
+//            connection.send(subTopic(CandlestickInterval.MIN1));
 //            connection.send(subTopic(CandlestickRequest.CandlestickInterval.MIN5));
 //            connection.send(subTopic(CandlestickRequest.CandlestickInterval.MIN15));
 //            connection.send(subTopic(CandlestickRequest.CandlestickInterval.MIN30));
@@ -84,4 +94,14 @@ public class HuobiWebSocketHandler implements WebSocketHandler<String>, Encoder 
         return command;
     }
 
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        if(collectorProperties.getSymbols() != null){
+            Arrays.stream(collectorProperties.getSymbols()).forEach(symbol ->{
+                Arrays.stream(CandlestickInterval.values()).forEach(period ->{
+                    databaseInitializeHandler.createTable(collectorProperties.getDialect(),collectorProperties.getLogicTable(),  symbol, period.getCode());
+                });
+            });
+        }
+    }
 }

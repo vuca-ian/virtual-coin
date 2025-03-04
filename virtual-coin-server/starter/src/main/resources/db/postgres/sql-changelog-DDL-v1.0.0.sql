@@ -87,6 +87,7 @@ CREATE TABLE IF NOT EXISTS t_candlestick_ethusdt_1min
     low decimal(10,4) NOT NULL,
     high decimal(10,4) NOT NULL,
     vol decimal(10,5) NOT NULL,
+    open_time bigint NOT NULL,
     analysis text  NULL,
     indicator text  NULL,
     primary key (id)
@@ -103,5 +104,6 @@ COMMENT ON COLUMN t_candlestick_ethusdt_1min.high IS '最高价';
 COMMENT ON COLUMN t_candlestick_ethusdt_1min.vol IS '成交额, 即 sum(每一笔成交价 * 该笔的成交量)';
 COMMENT ON COLUMN t_candlestick_ethusdt_1min.analysis IS '分析';
 COMMENT ON COLUMN t_candlestick_ethusdt_1min.indicator IS '指标';
+COMMENT ON COLUMN t_candlestick_ethusdt_1min.open_time IS '开盘时间';
 
 

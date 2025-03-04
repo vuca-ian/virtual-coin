@@ -12,7 +12,7 @@ import java.net.URL;
 
 /**
  * @author gdyang
- * @date 2021/8/2 2:14 下午
+ * @since 2021/8/2 2:14 下午
  */
 @Slf4j
 public class WebSocketAuthenticManage implements AuthenticManage {

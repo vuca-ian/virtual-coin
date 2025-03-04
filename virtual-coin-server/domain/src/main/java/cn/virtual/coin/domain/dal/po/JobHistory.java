@@ -28,6 +28,8 @@ public class JobHistory extends Model<String> {
 
     private Integer loopCount;
 
+    private Long lastDataId;
+
     public JobHistory(String symbol, String period) {
         this.symbol = symbol;
         this.period = period;

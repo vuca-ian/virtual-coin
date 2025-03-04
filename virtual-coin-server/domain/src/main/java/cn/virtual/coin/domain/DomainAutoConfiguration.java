@@ -1,5 +1,6 @@
 package cn.virtual.coin.domain;
 
+import cn.virtual.coin.domain.mybatis.CustomSqlInjector;
 import cn.virtual.coin.domain.sharding.ComplexShardingTableInterceptor;
 import cn.virtual.coin.domain.sharding.ShardingAlgorithmProperty;
 import com.baomidou.mybatisplus.annotation.DbType;
@@ -27,7 +28,10 @@ public class DomainAutoConfiguration {
     public ShardingAlgorithmProperty shardingAlgorithmProperty(){
         return new ShardingAlgorithmProperty();
     }
-
+    @Bean
+    public CustomSqlInjector easySqlInjector(){
+        return new CustomSqlInjector();
+    }
 
     @Bean
     public MybatisPlusInterceptor mybatisPlusInterceptor(ComplexShardingTableInterceptor complexShardingTableInterceptor) {

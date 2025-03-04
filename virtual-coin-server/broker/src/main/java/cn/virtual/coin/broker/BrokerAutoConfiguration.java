@@ -6,15 +6,20 @@ import cn.virtual.coin.broker.htx.WebSocketAuthenticManage;
 import cn.virtual.coin.broker.htx.WebSocketConnectionFactoryBean;
 import cn.virtual.coin.broker.htx.filter.*;
 import cn.virtual.coin.broker.htx.utils.HttpService;
+import cn.virtual.coin.broker.property.CollectorProperties;
+import cn.virtual.coin.broker.service.DatabaseInitializeHandler;
 import cn.virtual.coin.websocket.WebSocketConnection;
 import cn.virtual.coin.websocket.WebSocketHandler;
 import cn.virtual.coin.websocket.chain.FilterContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+
+import javax.sql.DataSource;
 
 /**
  * @author gdyang
@@ -26,6 +31,15 @@ public class BrokerAutoConfiguration {
 
     private static final String HOST = "wss://api.huobi.pro";
     private static final String PATH = "/ws";
+
+    @Bean
+    @ConfigurationProperties(prefix = "coin.collector")
+    public CollectorProperties collectorProperties(){
+        return new CollectorProperties();
+    }
+
+
+
     @Bean
     public HttpService httpService(){
         return new HttpService("https://api.huobi.pro");
@@ -40,8 +54,8 @@ public class BrokerAutoConfiguration {
         }
 
         @Bean
-        public WebSocketHandler<String> huobiWebSocketHandler(@Autowired(required = false) FilterContext<?> filterContext){
-            return new HuobiWebSocketHandler(filterContext);
+        public WebSocketHandler<String> huobiWebSocketHandler(@Autowired(required = false) FilterContext<?> filterContext, DatabaseInitializeHandler databaseInitializeHandler,CollectorProperties collectorProperties){
+            return new HuobiWebSocketHandler(filterContext, databaseInitializeHandler, collectorProperties);
         }
 
         @Bean("ws_v1")

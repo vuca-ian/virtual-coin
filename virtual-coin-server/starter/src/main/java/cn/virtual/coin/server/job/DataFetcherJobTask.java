@@ -18,6 +18,7 @@ import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -84,8 +85,9 @@ public class DataFetcherJobTask extends QuartzJobBean {
         command.put("id", System.nanoTime());
         command.put("from", next.minusMinutes(1).atZone(ZoneId.systemDefault()).toInstant().getEpochSecond());
         command.put("to", to);
-        log.info("send command to fetch data of leaking,{}, {}",
+        log.debug("send command to fetch data of leaking,{}, {}",
                 DEFAULT_FORMATTER.format(next), command.toJSONString());
+        log.info("{} =>from:{}, to:{}",  topic, DEFAULT_FORMATTER.format(next.minusMinutes(1).atZone(ZoneId.systemDefault())), DEFAULT_FORMATTER.format(Instant.ofEpochSecond(to).atZone(ZoneId.systemDefault())));
         connection.send(command.toJSONString());
     }
 }

@@ -3,7 +3,7 @@ package cn.virtual.coin.broker.htx.utils;
 /**
  *
  * @author gdyang
- * @date 2021/4/10 10:00 下午
+ * @since 2021/4/10 10:00 下午
  */
 public interface IErrorMessage {
 

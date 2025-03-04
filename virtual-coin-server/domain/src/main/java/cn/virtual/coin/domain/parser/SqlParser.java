@@ -2,6 +2,7 @@ package cn.virtual.coin.domain.parser;
 
 import cn.virtual.coin.domain.sharding.ComplexShardingTableAlgorithm;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.PluginUtils;
 import com.baomidou.mybatisplus.extension.parser.JsqlParserSupport;
@@ -9,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
-import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
 import net.sf.jsqlparser.expression.operators.relational.ParenthesedExpressionList;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
@@ -25,11 +25,7 @@ import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.session.Configuration;
 
-import java.io.ObjectInputFilter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -67,14 +63,40 @@ public class SqlParser extends JsqlParserSupport {
     }
 
     protected void processInsert(Insert insert, int index, String sql, Object obj) {
-        List<Column> columns = insert.getColumns();
-        MetaObject object = configuration.newMetaObject(obj);
         Table table = insert.getTable();
-        table.setName(this.complexShardingTableAlgorithm.doSharding(table.getName(), object));
+        if(obj instanceof Collection<?> && !((Collection<?>) obj).isEmpty()){
+            Object first = ((Collection<?>) obj).stream().findFirst().get();
+            table.setName(this.complexShardingTableAlgorithm.doSharding(table.getName(), configuration.newMetaObject(first)));
+        }else if(obj instanceof MapperMethod.ParamMap<?> paramMap) {
+            Object list =  paramMap.get("list");
+            if(list instanceof Collection<?> && !((Collection<?>) list).isEmpty()){
+                Object first = ((Collection<?>) list).stream().findFirst().get();
+                table.setName(this.complexShardingTableAlgorithm.doSharding(table.getName(), configuration.newMetaObject(first)));
+            }
+        }else{
+            MetaObject object = configuration.newMetaObject(obj);
+            table.setName(this.complexShardingTableAlgorithm.doSharding(table.getName(), object));
+        }
     }
 
     protected void processUpdate(Update update, int index, String sql, Object obj) {
-
+        final Table table = update.getTable();
+        if(obj instanceof MapperMethod.ParamMap<?> paramMap){
+//            LambdaUpdateWrapper<?> query = (LambdaUpdateWrapper<?>) paramMap.get("ew");
+//            String fieldName = StrUtil.toCamelCase(column);
+            Object value = paramMap.getOrDefault("et", null);
+            if(null != value){
+                MetaObject object = configuration.newMetaObject(value);
+                table.setName(this.complexShardingTableAlgorithm.doSharding(table.getName(), object));
+            }else{
+                Expression expression = update.getWhere();
+                Map<String, Object> parameter = new HashMap<>();
+                parserExpression(expression, paramMap, parameter);
+            }
+        }else{
+            MetaObject object = configuration.newMetaObject(obj);
+            table.setName(this.complexShardingTableAlgorithm.doSharding(table.getName(), object));
+        }
     }
 
     @Override
