@@ -26,4 +26,3 @@ COMMENT ON COLUMN {table}_{symbol}_{period}.high IS '最高价';
 COMMENT ON COLUMN {table}_{symbol}_{period}.vol IS '成交额, 即 sum(每一笔成交价 * 该笔的成交量)';
 COMMENT ON COLUMN {table}_{symbol}_{period}.analysis IS '分析';
 COMMENT ON COLUMN {table}_{symbol}_{period}.indicator IS '指标';
-COMMENT ON COLUMN {table}_{symbol}_{period}.open_time IS '开盘时间';

@@ -66,44 +66,14 @@ CREATE TABLE IF NOT EXISTS t_job_history
     period VARCHAR(32) NOT NULL,
     last_data_time varchar(20) NOT NULL,
     loop_count int4 NOT NULL,
+    last_data_id bigint NOT NULL DEFAULT '0',
     primary key (id)
     );
 COMMENT ON TABLE t_job_history IS '任务历史表';
 COMMENT ON COLUMN t_job_history.symbol IS '符号';
 COMMENT ON COLUMN t_job_history.period IS '周期';
 COMMENT ON COLUMN t_job_history.last_data_time IS '最后一条数据时间';
+COMMENT ON COLUMN t_job_history.last_data_id IS '最后一条数据ID';
 COMMENT ON COLUMN t_job_history.loop_count IS '遍历次数';
-
-
-CREATE TABLE IF NOT EXISTS t_candlestick_ethusdt_1min
-(
-    id BIGINT NOT NULL,
-    symbol VARCHAR(20) NOT NULL,
-    period VARCHAR(10) NOT NULL,
-    count decimal(10,4) NOT NULL,
-    amount decimal(10,5) NOT NULL,
-    open decimal(10,4) NOT NULL,
-    close decimal(10,4) NOT NULL,
-    low decimal(10,4) NOT NULL,
-    high decimal(10,4) NOT NULL,
-    vol decimal(10,5) NOT NULL,
-    open_time bigint NOT NULL,
-    analysis text  NULL,
-    indicator text  NULL,
-    primary key (id)
-);
-COMMENT ON TABLE t_candlestick_ethusdt_1min IS 'K线烛台';
-COMMENT ON COLUMN t_candlestick_ethusdt_1min.symbol IS '符号';
-COMMENT ON COLUMN t_candlestick_ethusdt_1min.period IS '周期';
-COMMENT ON COLUMN t_candlestick_ethusdt_1min.count IS '成交笔数';
-COMMENT ON COLUMN t_candlestick_ethusdt_1min.amount IS '成交量';
-COMMENT ON COLUMN t_candlestick_ethusdt_1min.open IS '开盘价';
-COMMENT ON COLUMN t_candlestick_ethusdt_1min.close IS '收盘价（当K线为最晚的一根时，是最新成交价）';
-COMMENT ON COLUMN t_candlestick_ethusdt_1min.low IS '最低价';
-COMMENT ON COLUMN t_candlestick_ethusdt_1min.high IS '最高价';
-COMMENT ON COLUMN t_candlestick_ethusdt_1min.vol IS '成交额, 即 sum(每一笔成交价 * 该笔的成交量)';
-COMMENT ON COLUMN t_candlestick_ethusdt_1min.analysis IS '分析';
-COMMENT ON COLUMN t_candlestick_ethusdt_1min.indicator IS '指标';
-COMMENT ON COLUMN t_candlestick_ethusdt_1min.open_time IS '开盘时间';
 
 

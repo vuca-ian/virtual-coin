@@ -7,3 +7,11 @@ databaseChangeLog:
             splitStatements: true
             stripComments: true
             path: classpath:db/postgres/sql-changelog-DDL-v1.0.0.sql
+  - changeSet:
+      id: 20250202402
+      author: vuca
+      changes:
+        - sqlFile:
+            splitStatements: true
+            stripComments: true
+            path: classpath:db/postgres/sql-changelog-DML-v1.0.0.sql
