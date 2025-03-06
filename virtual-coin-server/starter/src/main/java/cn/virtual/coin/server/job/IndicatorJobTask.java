@@ -25,6 +25,9 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -48,6 +51,7 @@ import java.util.stream.Collectors;
 public class IndicatorJobTask extends QuartzJobBean {
 
     private static final Pattern PATTERN = Pattern.compile("(?!=[a-zA-Z]+)(\\d)*");
+    private final DateTimeFormatter DEFAULT_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private final Lock lock = new ReentrantLock();
     @Resource
     private IJobHistoryService jobHistoryService;
@@ -105,7 +109,7 @@ public class IndicatorJobTask extends QuartzJobBean {
                 }));
                 latch.await();
                 lastDataId.set(tick.getId());
-                log.info("[{}]calc indicator for tick:{}#{}, indicator:{}", DateUtils.toDateString(new Date(tick.getId() * 1000)),
+                log.info("[{}]calc indicator for tick:{}#{}, indicator:{}", DEFAULT_FORMATTER.format(Instant.ofEpochSecond(lastDataId.get()).atZone(ZoneId.systemDefault())),
                         tick.getSymbol(), tick.getPeriod(), obj.toJSONString());
                 tick.setIndicator(obj.toJSONString());
 //                candlestickService.update(tick, Wrappers.<Candlestick>lambdaUpdate().eq(Candlestick::getSymbol, job.getSymbol())
