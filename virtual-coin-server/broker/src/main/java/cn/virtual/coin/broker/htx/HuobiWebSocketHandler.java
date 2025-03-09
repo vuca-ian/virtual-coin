@@ -4,6 +4,7 @@ import cn.virtual.coin.broker.htx.utils.CandlestickInterval;
 import cn.virtual.coin.broker.htx.utils.ServiceException;
 import cn.virtual.coin.broker.property.CollectorProperties;
 import cn.virtual.coin.broker.service.DatabaseInitializeHandler;
+import cn.virtual.coin.websocket.Options;
 import cn.virtual.coin.websocket.WebSocketConnection;
 import cn.virtual.coin.websocket.WebSocketHandler;
 import cn.virtual.coin.websocket.chain.FilterContext;
@@ -16,7 +17,10 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Service;
 
 import javax.sql.DataSource;
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Optional;
 
 /**
  * @author gdyang
@@ -57,7 +61,7 @@ public class HuobiWebSocketHandler implements WebSocketHandler<String>, Encoder,
         if(enabledSubscribe){
             Arrays.stream(collectorProperties.getSymbols()).forEach(symbol ->
                     Arrays.stream(CandlestickInterval.values()).forEach(interval ->
-                            connection.send(subTopic(symbol, interval))));
+                            Optional.ofNullable(subTopic(symbol, interval)).ifPresent(connection::send)));
         }
     }
 
@@ -79,7 +83,9 @@ public class HuobiWebSocketHandler implements WebSocketHandler<String>, Encoder,
         String topic = WEBSOCKET_CANDLESTICK_TOPIC
                 .replace("$symbol$", symbol)
                 .replace("$period$", interval.getCode());
-
+        if(LocalDateTime.now().getDayOfMonth() >1 && CandlestickInterval.YEAR1 == interval){
+            return null;
+        }
         JSONObject command = new JSONObject();
         command.put("sub", topic);
         command.put("id", System.nanoTime());

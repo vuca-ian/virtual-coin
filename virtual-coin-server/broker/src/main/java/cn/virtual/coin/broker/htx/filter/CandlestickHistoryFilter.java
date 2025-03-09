@@ -18,6 +18,7 @@ import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.lang.NonNull;
 
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 
 /**
@@ -44,17 +45,24 @@ public class CandlestickHistoryFilter implements Filter<JSONObject>, Application
                 CandlestickInterval interval = CandlestickInterval.accept(type);
                 String symbol = ch.substring(7, ch.indexOf("kline") - 1);
 //                log.info("{}, {}, {}", symbol, type, list);
-
-                    executor.execute(()-> {
-                        if(CollectionUtils.isNotEmpty(list)){
-                            list.forEach(candlestick -> {
-                                candlestick.setSymbol(symbol);
-                                candlestick.setPeriod(interval.getCode());
+                if(CollectionUtils.isNotEmpty(list)) {
+                    CountDownLatch latch = new CountDownLatch(list.size());
+                    list.forEach(candlestick -> {
+                        executor.execute(() -> {
+                            candlestick.setSymbol(symbol);
+                            candlestick.setPeriod(interval.getCode());
+                            try {
                                 candlestickService.saveCandlestick(candlestick);
-                            });
-                            applicationEventPublisher.publishEvent(new CandlestickEvent(new JobHistory(symbol, interval.getCode()), CandlestickEvent.EventType.batch));
-                        }
+                            } catch (Exception e) {
+                                log.error("save candlestick error", e);
+                            }finally {
+                                latch.countDown();
+                            }
+                        });
                     });
+                    latch.await();
+                    applicationEventPublisher.publishEvent(new CandlestickEvent(new JobHistory(symbol, interval.getCode()), CandlestickEvent.EventType.batch));
+                }
             } catch (Exception e) {
                 log.error("request candlestick error", e);
                 throw new RuntimeException(e);

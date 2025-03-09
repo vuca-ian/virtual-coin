@@ -17,7 +17,6 @@ import cn.vuca.cloud.commons.utils.StringUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import io.undertow.util.DateUtils;
 import jakarta.annotation.Resource;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +28,6 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
@@ -47,7 +45,7 @@ import java.util.stream.Collectors;
  * @since 2025/2/26 21:35
  */
 @Slf4j
-@JobTask(cron = "0 0/2 * * * ?", name = "IndicatorJobTask")
+//@JobTask(cron = "0 0/2 * * * ?", name = "IndicatorJobTask")
 public class IndicatorJobTask extends QuartzJobBean {
 
     private static final Pattern PATTERN = Pattern.compile("(?!=[a-zA-Z]+)(\\d)*");

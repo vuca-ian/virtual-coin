@@ -17,9 +17,9 @@ import java.util.concurrent.ThreadPoolExecutor;
 @Configuration
 public class ExecutorConfig {
 
-    @Value("${async.executor.thread.core_pool_size:5}")
+    @Value("${async.executor.thread.core_pool_size:8}")
     private int corePoolSize;
-    @Value("${async.executor.thread.max_pool_size:5}")
+    @Value("${async.executor.thread.max_pool_size:16}")
     private int maxPoolSize;
     @Value("${async.executor.thread.queue_capacity:99999}")
     private int queueCapacity;
